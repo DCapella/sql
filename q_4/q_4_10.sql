@@ -105,5 +105,3 @@ FROM accounts AS a
   ORDER BY 2 DESC
   LIMIT 10) AS t1
 -- 304846.969000000000
-
--- What is the lifetime average amount spent in terms of total_amt_usd for only the companies that spent more than the average of all orders.
