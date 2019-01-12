@@ -52,6 +52,59 @@ ON t3.total_usd = t2.total_usd
 
 -- For the region with the largest sales total_amt_usd, how many total orders were placed?
 --
+-- SELECT *
+-- FROM (SELECT r.name AS region, COUNT(*) AS total_orders
+--   FROM region AS r
+--   JOIN sales_reps AS s
+--   ON s.region_id = r.id
+--   JOIN accounts AS a
+--   ON a.sales_rep_id = s.id
+--   JOIN orders AS o
+--   ON o.account_id = a.id
+--   GROUP BY 1) AS t1
+-- JOIN (SELECT r.name AS region, SUM(o.total_amt_usd) AS total_usd
+--   FROM region AS r
+--   JOIN sales_reps AS s
+--   ON s.region_id = r.id
+--   JOIN accounts AS a
+--   ON a.sales_rep_id = s.id
+--   JOIN orders AS o
+--   ON o.account_id = a.id
+--   GROUP BY 1
+--   ORDER BY 2 DESC
+--   LIMIT 1) AS t2
+-- ON t1.region = t2.region
+
+
+WITH t1 AS (
+  SELECT r.name AS region, COUNT(*) AS total_orders
+  FROM region AS r
+  JOIN sales_reps AS s
+  ON s.region_id = r.id
+  JOIN accounts AS a
+  ON a.sales_rep_id = s.id
+  JOIN orders AS o
+  ON o.account_id = a.id
+  GROUP BY 1),
+t2 AS (
+  SELECT r.name AS region, SUM(o.total_amt_usd) AS total_usd
+  FROM region AS r
+  JOIN sales_reps AS s
+  ON s.region_id = r.id
+  JOIN accounts AS a
+  ON a.sales_rep_id = s.id
+  JOIN orders AS o
+  ON o.account_id = a.id
+  GROUP BY 1
+  ORDER BY 2 DESC
+  LIMIT 1
+)
+
+SELECT *
+FROM t1
+JOIN t2
+ON t1.region = t2.region
+
 -- For the name of the account that purchased the most (in total over their lifetime as a customer) standard_qty paper, how many accounts still had more in total purchases?
 --
 -- For the customer that spent the most (in total over their lifetime as a customer) total_amt_usd, how many web_events did they have for each channel?
