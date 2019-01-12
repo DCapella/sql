@@ -76,10 +76,34 @@ FROM (SELECT a.name AS name, SUM(o.total) AS total_amt
 
 -- 3
 
--- For the customer that spent the most (in total over their lifetime as a customer) total_amt_usd, how many web_events did they have for each channel?
+-- For the customer that spent the most (in total over their lifetime as a customer)
+-- total_amt_usd, how many web_events did they have for each channel?
 --
-
+SELECT *
+FROM (SELECT a.name AS account, SUM(o.total_amt_usd) AS total_usd
+  FROM accounts AS a
+  JOIN orders AS o
+  ON o.account_id = a.id
+  GROUP BY 1
+  ORDER BY 2 DESC
+  LIMIT 1) AS t1
+JOIN (SELECT a.name AS account, we.channel AS channel, COUNT(*)
+  FROM accounts AS a
+  JOIN web_events AS we
+  ON we.account_id = a.id
+  GROUP BY 1,2) AS t2
+ON t1.account = t2.account
 
 -- What is the lifetime average amount spent in terms of total_amt_usd for the top 10 total spending accounts?
 --
+SELECT AVG(total_usd)
+FROM (SELECT a.name AS account, SUM(o.total_amt_usd) AS total_usd
+FROM accounts AS a
+  JOIN orders AS o
+  ON o.account_id = a.id
+  GROUP BY 1
+  ORDER BY 2 DESC
+  LIMIT 10) AS t1
+-- 304846.969000000000
+
 -- What is the lifetime average amount spent in terms of total_amt_usd for only the companies that spent more than the average of all orders.
